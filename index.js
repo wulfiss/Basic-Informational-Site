@@ -1,7 +1,7 @@
 const http = require('http');
 const fs = require('fs');
 
-http
+/* http
 	.createServer((req, res) => {
 		if (req.url === '/') {
 			fs.readFile('./pages/index.html', (err, data) => {
@@ -35,28 +35,36 @@ http
 	})
 	.listen(8080, () => {
 		console.log('Listen to port 8080 ....');
-	});
+	}); */
 
-/* const pages = {
-	'/': './pages/index.html',
-	'/about': './pages/about.html',
-	'/contact-me': './pages/contact-me.html',
-	'/404': './pages/404.html'
+// use an object to store the file paths
+const routes = {
+	'/': { filePath: './pages/index.html' },
+	'/about': { filePath: './pages/about.html' },
+	'/contact-me': { filePath: './pages/contact-me.html' }
 };
- */
-/* http
+
+//a helper function to read a file and send the responses
+const sendResponse = (res, filePath, statusCode = 200) => {
+	fs.readFile(filePath, (err, data) => {
+		if (err) throw err;
+		res.writeHead(statusCode, { 'Content-Type': 'text/html' });
+		res.write(data);
+		res.end();
+	});
+};
+
+http
 	.createServer((req, res) => {
-		let page = req.url;
-		fs.readFile(path.join(__dirname, pages[page]), (err, data) => {
-			if (err) {
-				res.writeHead(404, { 'Content-Type': 'text/html' });
-				res.end('404 Not Found');
-			} else {
-				res.writeHead(200, { 'Content-Type': 'text/html' });
-				res.write(data);
-				res.end();
-			}
-		});
+		//check if the request url matches any of the routes
+		if (routes[req.url]) {
+			//use the object values to send response
+			sendResponse(res, routes[req.url].filePath);
+		} else {
+			//send a 404 response for any other url
+			sendResponse(res, './pages/404.html', 404);
+		}
 	})
-	.listen(8080);
- */
+	.listen(8080, () => {
+		console.log('Listen to port 8080 .....');
+	});
