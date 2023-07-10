@@ -1,5 +1,4 @@
 const http = require('http');
-const fs = require('fs');
 
 /* http
 	.createServer((req, res) => {
@@ -38,7 +37,7 @@ const fs = require('fs');
 	}); */
 
 // use an object to store the file paths
-const routes = {
+/* const routes = {
 	'/': { filePath: './pages/index.html' },
 	'/about': { filePath: './pages/about.html' },
 	'/contact-me': { filePath: './pages/contact-me.html' }
@@ -67,4 +66,49 @@ http
 	})
 	.listen(8080, () => {
 		console.log('Listen to port 8080 .....');
+	}); */
+
+const express = require('express');
+const e = require('express');
+const app = express();
+const port = 3000;
+const fs = require('fs');
+
+/* app.get('/', async (req, res) => {
+	res.send(await fsp.readFile('./pages/index.html', 'utf-8'));
+});
+
+app.get('/about', async (req, res) => {
+	res.send(await fsp.readFile('./pages/about.html', 'utf-8'));
+});
+
+app.get('/contact', async (req, res) => {
+	res.send(await fsp.readFile('./pages/contact-me.html', 'utf-8'));
+});
+
+app.use(async (req, res) => {
+	res.status(404).send(await fsp.readFile('./pages/404.html', 'utf-8'));
+}); */
+
+const pages = {
+	'/': './pages/index.html',
+	'/about': './pages/about.html',
+	'/contact-me': './pages/contact-me.html'
+};
+
+const notFoundPage = './pages/404.html';
+
+app.get('*', (req, res) => {
+	const pagePath = pages[req.path] || notFoundPage;
+	fs.readFile(pagePath, 'utf-8', (err, data) => {
+		if (err) {
+			res.status(404).send('Page not found');
+		} else {
+			res.send(data);
+		}
 	});
+});
+
+app.listen(port, () => {
+	console.log(`listening port ${port} or http://localhost:3000`);
+});
